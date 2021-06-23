@@ -3,11 +3,11 @@ import fitz
 
 def main():
 ## READ IN PDF
-    doc = fitz.open("test1.pdf")
+    doc = fitz.open("test2.pdf")
 
     for page in doc:
         ## SEARCH
-        text = "01"
+        text = "BPA"
         text_instances = page.searchFor(text)
         
         print(text_instances[0].bottom_right)

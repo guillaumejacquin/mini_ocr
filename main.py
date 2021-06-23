@@ -1,107 +1,38 @@
-import pdftotext
-import fitz
-import yaml
 import os
-import bios
+import urllib.request
+from app import app
+from flask import Flask, request, redirect, jsonify
+from werkzeug.utils import secure_filename
+from algo import *
 
-def mini_ocr(file):
-    with open(file, "rb") as f:
-        pdf = pdftotext.PDF(f)
-        text = "\n\n".join(pdf)
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
-    return(text)
-    
+def allowed_file(filename):
+	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def create_template(file_given, texte):
-    with fitz.open(file_given) as doc:
-        #POUR CREER UN NOUVEAU TEMPLATE, ON DONNE LE MOT IL PREND LE CARRE QU IL VA ENSUITE STOCKER DANS LE .YML
-        for page in doc:
-            ## SEARCH
-            text = texte
-            text_instances_a = page.searchFor(text)
-            ## HIGHLIGHT
-            text_instances_a = [num for num in text_instances_a[0] if isinstance(num, (int,float))]
+@app.route('/python/file', methods=['POST'])
+def upload_file():
+	# check if the post request has the file part
+	if 'file' not in request.files:
+		resp = jsonify({'message' : 'No file part in the request'})
+		resp.status_code = 400
+		return resp
+	file = request.files['file']
+	if file.filename == '':
+		resp = jsonify({'message' : 'No file selected for uploading'})
+		resp.status_code = 400
+		return resp
+	if file and allowed_file(file.filename):
+		filename = secure_filename(file.filename)
+		file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+		resp = jsonify(veriftemplates(os.path.join(app.config['UPLOAD_FOLDER'], filename)))
+		#resp =jsonify({'message' : 'File successfully uploaded'})
+		resp.status_code = 200
+		return resp
+	else:
+		resp = jsonify({'message' : 'Allowed file types are txt, pdf, png, jpg, jpeg, gif'})
+		resp.status_code = 400
+		return resp
 
-
-
-
-def veriftemplates(file_given):
-    
-    Result_reference = []
-    Révision = []
-    TypeDocument = []
-    EtatDocument = []
-
-    pdf_txt = mini_ocr(file_given)
-    template = False
-
-    for root, dirs, files in os.walk("templates"):
-        for file in files:
-            if(template == True):
-                break
-            else:
-                    maybefile = (os.path.join(root, file))
-
-                    with open(maybefile, "rb") as f:
-
-                
-                        my_dict = bios.read(maybefile)
-                        
-                        # print((all(my_dict['keywords'] in pdf_txt)))
-                        lefameux = (my_dict['keywords'])
-                        
-
-                        template = (all([w in pdf_txt for w in lefameux]))
-
-
-
-        
-        if not template:
-            print("aucun modele trouvé, nous vous conseillons d'en créer un")
-
-        else:
-            with fitz.open(file_given) as doc:
-                # #POUR CREER UN NOUVEAU TEMPLATE, ON DONNE LE MOT IL PREND LE CARRE QU IL VA ENSUITE STOCKER DANS LE .YML
-                # for page in doc:
-                #     ## SEARCH
-                #     text = "Synapture"
-                #     text_instances_a = page.searchFor(text)
-                #     ## HIGHLIGHT
-                #     text_instances_a = [num for num in text_instances_a[0] if isinstance(num, (int,float))]
-
-
-                ReferencePosition = my_dict['Référence']
-                ReferencePosition = ReferencePosition.split(",")
-
-                RevisionPosition = my_dict['Révision']
-                RevisionPosition = RevisionPosition.split(",")
-
-
-                TypeDocumentPosition = my_dict['Type de Document']
-                TypeDocumentPosition = TypeDocumentPosition.split(",")
-
-                EtatDocumentPosition = my_dict['Etat du Document']
-                EtatDocumentPosition = EtatDocumentPosition.split(",")
-
-
-
-                for page in doc:
-                    Result_reference = page.get_textbox(ReferencePosition)
-                    Revision = page.get_textbox(RevisionPosition)
-                    TypeDocument = page.get_textbox(TypeDocumentPosition)
-                    EtatDocument = page.get_textbox(EtatDocumentPosition)
-
-
-               
-
-
-    print("reference = ", Result_reference)
-    print("Revision = ", Revision)
-    print("Type document =", TypeDocument)
-    print("Etat document =", EtatDocument)    
-
-def main():
-    create_template("test1.pdf", "Synapture")
-    veriftemplates("test1.pdf")
-
-main()
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')
