@@ -28,11 +28,6 @@ def create_template(file_given, texte):
 
 def veriftemplates(file_given):
 
-    Result_reference = []
-    Révision = []
-    TypeDocument = []
-    EtatDocument = []
-
     pdf_txt = mini_ocr(file_given)
     template = False
 
@@ -56,43 +51,57 @@ def veriftemplates(file_given):
         exit()
 
     with fitz.open(file_given) as doc:
-        ReferencePosition = my_dict['Référence'].split(",")
-        RevisionPosition = my_dict['Révision'].split(",")
-        TypeDocumentPosition = my_dict['Type de Document'].split(",")
-        EtatDocumentPosition = my_dict['Etat du Document'].split(",")
+        
+        try:
+            ReferencePosition = my_dict['Référence'].split(",")
+            RevisionPosition = my_dict['Révision'].split(",")
+            TypeDocumentPosition = my_dict['Type de Document'].split(",")
+            EtatDocumentPosition = my_dict['Etat du Document'].split(",")
+            DesignDocPosition = my_dict['Désignation de doc'].split(",")
 
-        for page in doc:
-            Result_reference = page.get_textbox(ReferencePosition)
-            Revision = page.get_textbox(RevisionPosition)
-            TypeDocument = page.get_textbox(TypeDocumentPosition)
-            EtatDocument = page.get_textbox(EtatDocumentPosition)
-
-    print("reference = ", Result_reference)
-    print("Revision = ", Revision)
-    print("Type document =", TypeDocument)
-    print("Etat document =", EtatDocument)
+            for page in doc:
+                Result_reference = page.get_textbox(ReferencePosition)
+                Revision = page.get_textbox(RevisionPosition)
+                TypeDocument = page.get_textbox(TypeDocumentPosition)
+                EtatDocument = page.get_textbox(EtatDocumentPosition)
+                DesignDoc = page.get_textbox(DesignDocPosition)
 
 
-    with open('data.json', 'w') as f:
-        json.dump(Result_reference, f)
-        json.dump(Revision, f)
-        json.dump(TypeDocument, f)
-        json.dump(EtatDocument, f)
+        except Exception:
+            ReferencePosition = my_dict['Référence'].split(",")
+            RevisionPosition = my_dict['Révision'].split(",")
+            TypeDocumentPosition = my_dict['Type de Document'].split(",")
+            EtatDocumentPosition = my_dict['Etat du Document'].split(",")
 
-    data = {
-    "Reference" : Result_reference,
-    "Revision" : Revision,
-    "TypeDocument" : TypeDocument,
-    "EtatDocument" : EtatDocument    
-    }
-
+            for page in doc:
+                Result_reference = page.get_textbox(ReferencePosition)
+                Revision = page.get_textbox(RevisionPosition)
+                TypeDocument = page.get_textbox(TypeDocumentPosition)
+                EtatDocument = page.get_textbox(EtatDocumentPosition)
+    try:
+        data = {
+        "Reference" : Result_reference,
+        "Revision" : Revision,
+        "TypeDocument" : TypeDocument,
+        "EtatDocument" : EtatDocument ,  
+        "désignation de doc" : DesignDoc
+        }
+    except :
+        data = {
+        "Reference" : Result_reference,
+        "Revision" : Revision,
+        "TypeDocument" : TypeDocument,
+        "EtatDocument" : EtatDocument 
+        }
+    print(data)
         
     # with open('data.json', 'w') as outfile:
     #     oui = json.dump(data, outfile)
     return(data)
+
 def main():
     # create_template("test1.pdf", "Synapture")
-    veriftemplates("test2.pdf")
+    veriftemplates("test1.pdf")
 
 
 main()
