@@ -93,7 +93,6 @@ def veriftemplates(file_given):
         "TypeDocument" : TypeDocument,
         "EtatDocument" : EtatDocument 
         }
-    print(data)
         
     # with open('data.json', 'w') as outfile:
     #     oui = json.dump(data, outfile)
@@ -101,7 +100,7 @@ def veriftemplates(file_given):
 
 def main():
     # create_template("test1.pdf", "Synapture")
-    veriftemplates("test1.pdf")
+    print(veriftemplates("test1.pdf"))
 
 
 main()
