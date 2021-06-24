@@ -87,9 +87,9 @@ def veriftemplates(file_given):
     }
 
         
-    with open('data.json', 'w') as outfile:
-        json.dump(data, outfile)
-
+    # with open('data.json', 'w') as outfile:
+    #     oui = json.dump(data, outfile)
+    return(data)
 def main():
     # create_template("test1.pdf", "Synapture")
     veriftemplates("test2.pdf")
