@@ -1,34 +1,17 @@
+string = "salut je suis guillaume salutt sosalut je suis lut"
+a = []
 
-import fitz
+some_list = string.split()
 
-def main():
-## READ IN PDF
-    doc = fitz.open("test2.pdf")
+a = ([x for x in some_list if "salut" in x])
 
-    for page in doc:
-        ## SEARCH
-        text = "BPA"
-        text_instances = page.searchFor(text)
-        
-        print(text_instances[0].bottom_right)
-        print(text_instances[0].bottom_left)
-        print(text_instances[0].top_right)
-        print(text_instances[0].top_left)
 
- 
+# a=[], for x in my_list:, if hello in x: , a.append(x), print(a)
+# a = []
 
-        ## HIGHLIGHT
-        list_2 = [num for num in text_instances[0] if isinstance(num, (int,float))]
-        print(list_2)
+# for x in some_list:
+#     if ("salut" in x):
+#         a.append(x)
 
-        # for inst in text_instances:
-        #     print(inst)
-        #     highlight = page.addHighlightAnnot(inst)
-        #     print(inst)
-        #     highlight.update()
 
-        print(page.get_textbox(list_2))
-        print(text_instances)
-    doc.save("i.pdf", garbage=4, deflate=True, clean=True)
-
-main()
+print(a)

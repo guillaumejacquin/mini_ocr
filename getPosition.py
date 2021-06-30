@@ -71,5 +71,5 @@ def getPostionOneELement(reference, pdf):
 
 # get_position_templates("BPA","BPA", "BPA", "BPA")
 
-reference = getPostionOneELement("Data Sheet Pompe P11-RS-10", "test2.pdf")
+reference = getPostionOneELement("BPE", "test1.pdf")
 print(reference)
